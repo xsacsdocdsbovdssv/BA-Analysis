@@ -5,7 +5,11 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import PatternFill
 import datetime
 
-def process_financial_report(input_file):
+
+def clean_numeric_row(row):
+    return pd.to_numeric(row.astype(str).str.replace(",", "").str.strip(), errors='coerce')
+
+def process_financial_report(input_file:str) -> str:
     """处理半天妖财务报表的主函数"""
 
     # 1. 准备文件路径
@@ -19,6 +23,9 @@ def process_financial_report(input_file):
         df_raw = pd.read_excel(input_file, header=1)
         df_items = df_raw.set_index("项 目")
         df_items = df_items.drop(["行次", "合计"], axis=1, errors="ignore")
+        df_items = df_items.apply(clean_numeric_row)
+        # 清洗为数字
+        df_items = df_items.apply(lambda row: pd.to_numeric(row.astype(str).str.replace(",", "").str.strip(), errors='coerce'))
 
         # 3. 计算关键指标
         print("正在计算经营指标...")
@@ -110,7 +117,7 @@ def process_financial_report(input_file):
 
         # 5. 写入临时Excel文件
         print("正在生成临时文件...")
-        df_calc.to_excel(temp_file, sheet_name="经营分析", index=True)
+        df_calc.to_excel(temp_file, sheet_name="经营分析", index=True, index_label="项 目")
 
         # 6. 格式处理
         print("正在格式化输出文件...")
@@ -156,12 +163,3 @@ def process_financial_report(input_file):
         if os.path.exists(temp_file):
             os.remove(temp_file)
             print("已清理临时文件")
-
-# 使用示例
-if __name__ == "__main__":
-    input_file = "/Users/zhaozhilong/Desktop/work/半天妖/其他/商业分析/基础文档/管理报表/半天妖2025.03上交管理表完整版 - 不含#号.xlsx"
-    try:
-        result_file = process_financial_report(input_file)
-        print(f"处理完成，结果文件: {result_file}")
-    except Exception as e:
-        print(f"处理失败: {str(e)}")
