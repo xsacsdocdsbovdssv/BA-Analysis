@@ -15,7 +15,7 @@ def load_and_preprocess(filepath):
     try:
         df_raw = pd.read_excel(filepath, header=0)
         df = df_raw.set_index('Unnamed: 0').T
-        df.columns = ['期末结存金额', '鱼结存金额', '鱼结存占比']
+        df.columns = ['期末结存金额', '鱼结存金额', '鱼结存占比', '实收金额']
 
         for col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
@@ -59,9 +59,10 @@ def plot_inventory_analysis(df):
     month_fmt = mdates.DateFormatter('%y-%m')
 
     # 图1：库存金额趋势
-    ax1 = axs[0, 0]
-    ax1.plot(df['月份'], df['期末结存金额']/1e8, label='总库存', marker='o')
-    ax1.plot(df['月份'], df['鱼结存金额']/1e8, label='鱼类库存', marker='s')
+    ax1 = axs[0,0]
+    ax1.plot(df['月份'], df['期末结存金额']/1e8, label='总库存', marker='o')# 设置总库存为蓝色点
+    ax1.plot(df['月份'], df['鱼结存金额']/1e8, label='鱼类库存', marker='s')# 设置鱼类库存为绿色方块
+    ax1.plot(df['月份'], df['实收金额']/1e8, label='总实收', marker='^')# 设置总实收为红色三角
     ax1.set_title('库存金额趋势（亿元）')
     ax1.set_ylabel('金额（亿元）')
     ax1.legend()
@@ -70,7 +71,7 @@ def plot_inventory_analysis(df):
     ax1.xaxis.set_major_formatter(month_fmt)
 
     # 图2：鱼类库存占比
-    ax2 = axs[0, 1]
+    ax2 = axs[0,1]
     ax2.plot(df['月份'], df['鱼结存占比']*100, color='green', marker='^')
     ax2.set_title('鱼类库存占比趋势')
     ax2.set_ylabel('占比（%）')

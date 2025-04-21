@@ -101,8 +101,8 @@ def process_financial_report(input_file:str) -> str:
             "日均外卖单数": np.nan,
             "台均价": np.nan,
             "外卖单均价": np.nan,
-            "单均食材成本": np.nan,
-            "单均外卖包装成本": np.nan
+            # "单均食材成本": np.nan,
+            # "单均外卖包装成本": np.nan
 
         })
         # df_calc["实际人工"] = Actual_labor
